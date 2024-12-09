@@ -2,26 +2,39 @@ using System;
 
 public class Matrix
 {
-	private int[] values;
+	private double[, ] values;
 	private (int, int) dims;
-	
+
+	public double this[int i, int j] {
+		get => this.values[i,j];
+		set => this.values[i,j] = value;
+	}
+
 	public Matrix(int m, int n, bool RandomInputs = true)
 	{
 		this.dims = (m, n);
-		this.values = new int[n * m];
+		this.values = new double[m, n];
+		
 		if (RandomInputs)
 		{
 			Random r = new Random();
-			for (int i = 0; i < n * m; i++)
+			
+			for (int i = 0; i < m; i++)
 			{
-				this.values[i] = r.Next(1, 100);
+				for (int j = 0; j < n; j++)
+				{
+					this[i, j] = r.Next(1, 100);
+				}
 			}
 		}
 		else
 		{
-			for (int i = 0; i < n * m; i++)
+			for (int i = 0; i < m; i++)
 			{
-				this.values[i] = 0;
+				for (int j = 0; j < n; j++)
+				{
+					this[i, j] = 0.0;
+				}
 			}
 		}
 	}
@@ -29,59 +42,72 @@ public class Matrix
 	public override string ToString()
 	{
 		string result = "";
-		for (int i = 0; i < this.dims.Item1 * this.dims.Item2; i++)
+		
+		for (int i = 0; i < this.dims.Item1; i++)
 		{
-			result += $"{this.values[i]} ";
-			if ((i + 1) % this.dims.Item2 == 0)
+			for (int j = 0; j < this.dims.Item2; j++)
 			{
-				result += "\n";
+				result += $"{this[i, j]} ";
 			}
+
+			result += "\n";
 		}
 
 		return result;
 	}
-	
-	public int[] this[int i]
-	{
-		get;
-	}
 
+
+	
 	public static Matrix operator +(Matrix A, Matrix B)
 	{
 		Matrix C = new Matrix(A.dims.Item1, A.dims.Item2, false);
-		for (int i = 0; i < A.dims.Item1 * A.dims.Item2; i++)
+		
+		for (int i = 0; i < A.dims.Item1; i++)
 		{
-			C.values[i] = A.values[i] + B.values[i];
+			for (int j = 0; j < A.dims.Item2; j++)
+			{
+				C[i, j] = A[i, j] + B[i, j];
+			}
 		}
 
 		return C;
 	}
-	
-	public static Matrix operator *(Matrix A, Matrix B) {
+
+	public static Matrix operator *(Matrix A, Matrix B)
+	{
 		Matrix C = new Matrix(A.dims.Item1, B.dims.Item2, false);
 		
-		for (int i = 0; i < A.dims.Item1; i++){
-			for(int j = 0; j < B.dims.Item2; j++){
-				for (int k = 0; k < 0; k++){
-					C.values[i] += ;
+		for (int i = 0; i < A.dims.Item1; i++)
+		{
+			for (int j = 0; j < B.dims.Item2; j++)
+			{
+				for (int k = 0; k < 0; k++)
+				{
+					C[i, j] += A[i, k] * B[k, j];
 				}
 			}
 		}
-		
+
 		return C;
 	}
-	
-	public static Matrix operator *(Matrix A, int a){
+
+	public static Matrix operator *(Matrix A, double a)
+	{
 		Matrix C = new Matrix(A.dims.Item1, A.dims.Item2, false);
 		
-		for (int i = 0; i < A.dims.Item1 * A.dims.Item2; i++){
-			C.values[i] = A.values[i] * a;
+		for (int i = 0; i < A.dims.Item1; i++)
+		{
+			for (int j = 0; j < A.dims.Item2; j++)
+			{
+				C[i, j] = A[i, j] * a;
+			}
 		}
-		
+
 		return C;
 	}
-	
-	public static Matrix operator *(int a, Matrix A){
+
+	public static Matrix operator *(double a, Matrix A)
+	{
 		return A * a;
 	}
 }
