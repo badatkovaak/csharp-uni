@@ -6,6 +6,8 @@ public class Matrix
 	private (int, int) dims;
 	public double this[int i, int j] { get => this.values[i, j]; set => this.values[i, j] = value; }
 
+	public (int, int) Dims { get => this.dims; set => this.dims = value; }
+
 	public Matrix(int m, int n, bool RandomInputs = true)
 	{
 		this.dims = (m, n);
@@ -209,37 +211,79 @@ public class Matrix
 		A.values = this.values;
 		return A;
 	}
-	
-	public Matrix create_without() {
+
+	public Matrix create_without()
+	{
 		Matrix C = new Matrix(this.dims.Item1 - 1, this.dims.Item2 - 1);
-		for(int i = 1; i < this.dims.Item1; i++){
-			for(int j = 1; j < this.dims.Item2; j++){
-				C[i-1,j-1] = this[i,j];
-			} 
+		for (int i = 1; i < this.dims.Item1; i++)
+		{
+			for (int j = 1; j < this.dims.Item2; j++)
+			{
+				C[i - 1, j - 1] = this[i, j];
+			}
 		}
+
 		return C;
 	}
-	
-	public int calculate_rank() {
-		if (this[0,0] == 0){
-			for(int i = 1; i < this.dims.Item1; i++){
-				if (this[i,0] != 0){
-					this.swap_rows(0,i);
+
+	public int calculate_rank()
+	{
+		if (this.dims.Item1 == 1)
+		{
+			return this[0, 0] == 0.0 ? 0 : 1;
+		}
+
+		Matrix C = this.clone();
+		if (C[0, 0] == 0)
+		{
+			for (int i = 1; i < C.dims.Item1; i++)
+			{
+				if (C[i, 0] != 0)
+				{
+					C.swap_rows(0, i);
 					break;
 				}
-				if (i == this.dims.Item2 - 1){
-					return this.create_without().calculate_rank();		
+
+				if (i == C.dims.Item2 - 1)
+				{
+					return C.create_without().calculate_rank();
 				}
 			}
-		}  
-		
-		for(int i = 1; i < this.dims.Item1; i++){
-			this.add_row(0,i, -this[i,0]/this[0,0]);
 		}
-		
-		Console.WriteLine(this);
-		
-		return this.create_without().calculate_rank();
+
+		for (int i = 1; i < C.dims.Item1; i++)
+		{
+			C.add_row(0, i, -C[i, 0] / C[0, 0]);
+		}
+
+		return C.create_without().calculate_rank() + 1;
+	}
+}
+
+public class SquareMatrix : Matrix
+{
+	public SquareMatrix(int n, bool FillRandomly = true) : base(n, n, FillRandomly)
+	{
+	}
+
+	public static SquareMatrix operator *(SquareMatrix A, SquareMatrix B)
+	{
+		return A * B;
+	}
+
+	public static SquareMatrix operator *(SquareMatrix A, Matrix B)
+	{
+		if (B.Dims.Item1 != B.Dims.Item2)
+		{
+			throw new Exception();
+		}
+
+		return A * B;
+	}
+
+	public static SquareMatrix operator *(Matrix A, SquareMatrix B)
+	{
+		return B * A;
 	}
 }
 
@@ -247,16 +291,20 @@ public class Program
 {
 	public static void Main()
 	{
-		Matrix A = new Matrix(2, 2);
-		Matrix B = new Matrix(2, 2);
+		Matrix A = new Matrix(3, 3);
+		Matrix B = new SquareMatrix(3);
 		Console.WriteLine(A);
-		// Console.WriteLine(B);
-		// Console.WriteLine(A + B);
-		// Console.WriteLine(A * B);
+		Console.WriteLine(B);
+		Console.WriteLine(A + B);
+		Console.WriteLine(A * B);
+		Console.WriteLine(B * A);
 		// Console.WriteLine(A.swap_rows(0, 1));
 		// Console.WriteLine(A.add_row(0, 1, 2.0));
 		// Console.WriteLine(A.multiply_row(0, 2.0));
-		Console.WriteLine(A.create_without());
+		// Console.WriteLine(A.create_without());
 		Console.WriteLine(A.calculate_rank());
+		Console.WriteLine(B.calculate_rank());
+		Console.WriteLine(A);
+		Console.WriteLine(B);
 	}
 }
