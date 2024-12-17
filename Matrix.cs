@@ -179,16 +179,16 @@ public class Matrix
 		return this;
 	}
 
-	public Matrix add_row(int i, int j, double m)
+	public Matrix add_row(int j, int i, double m)
 	{
 		Matrix C = new Matrix(this.dims, false);
 		for (int k = 0; k < this.dims.Item1; k++)
 		{
 			for (int l = 0; l < this.dims.Item2; l++)
 			{
-				if (k != l && k != i && l != j)
+				if (k == i && l == j)
 				{
-					C[k, l] = 0;
+					C[k, l] = m;
 				}
 				else if (k == l)
 				{
@@ -196,7 +196,7 @@ public class Matrix
 				}
 				else
 				{
-					C[k, l] = m;
+					C[k, l] = 0;
 				}
 			}
 		}
@@ -258,6 +258,45 @@ public class Matrix
 
 		return C.create_without().calculate_rank() + 1;
 	}
+	
+	public Matrix to_row_echelon_form(int start_i, int start_j) {	
+        Console.WriteLine(start_i.ToString());
+        Console.WriteLine(start_j.ToString());
+
+		if(this.dims.Item1 <= start_i  + 1){
+			return this;
+		}
+		
+		if (this[start_i, start_j] == 0)
+		{
+			for (int i = start_i + 1; i < this.dims.Item1; i++)
+			{
+				if (this[i, start_j] != 0)
+				{
+					this.swap_rows(start_i, i);
+					break;
+				}
+
+				if (i == this.dims.Item2 - 1)
+				{
+                    Console.WriteLine(this);
+					return this.to_row_echelon_form(start_i, start_j + 1);
+				}
+			}
+		}
+
+		for (int i = start_i + 1; i < this.dims.Item1; i++)
+		{
+            Console.WriteLine($"added {start_i} {i} {-this[i,start_j]/this[start_i,start_j]}");
+			Console.WriteLine(this);
+            this.add_row(start_i, i, -this[i, start_j] / this[start_i, start_j]);
+            Console.WriteLine(this);
+        }
+
+        Console.WriteLine(this);
+
+		return this.to_row_echelon_form(start_i + 1, start_j + 1);
+	}
 }
 
 public class SquareMatrix : Matrix
@@ -283,7 +322,12 @@ public class SquareMatrix : Matrix
 
 	public static SquareMatrix operator *(Matrix A, SquareMatrix B)
 	{
-		return B * A;
+		if (A.Dims.Item1 != A.Dims.Item2)
+		{
+			throw new Exception();
+		}
+
+		return A * B;
 	}
 }
 
@@ -291,20 +335,21 @@ public class Program
 {
 	public static void Main()
 	{
-		Matrix A = new Matrix(3, 3);
+		Matrix A = new Matrix(3,3);
 		Matrix B = new SquareMatrix(3);
 		Console.WriteLine(A);
-		Console.WriteLine(B);
-		Console.WriteLine(A + B);
-		Console.WriteLine(A * B);
-		Console.WriteLine(B * A);
+		// Console.WriteLine(B);
+		// Console.WriteLine(A + B);
+		// Console.WriteLine(A * B);
+		// Console.WriteLine(B * A);
 		// Console.WriteLine(A.swap_rows(0, 1));
 		// Console.WriteLine(A.add_row(0, 1, 2.0));
 		// Console.WriteLine(A.multiply_row(0, 2.0));
 		// Console.WriteLine(A.create_without());
-		Console.WriteLine(A.calculate_rank());
-		Console.WriteLine(B.calculate_rank());
-		Console.WriteLine(A);
-		Console.WriteLine(B);
+		// Console.WriteLine(A.calculate_rank());
+		// Console.WriteLine(B.calculate_rank());
+		Console.WriteLine(A.to_row_echelon_form(0,0));
+		// Console.WriteLine(A);
+		// Console.WriteLine(B);
 	}
 }
