@@ -1,4 +1,5 @@
 using System;
+using System.Threading;
 
 public class Matrix
 {
@@ -260,8 +261,8 @@ public class Matrix
 	}
 	
 	public Matrix to_row_echelon_form(int start_i, int start_j) {	
-        Console.WriteLine(start_i.ToString());
-        Console.WriteLine(start_j.ToString());
+        // Console.WriteLine(start_i.ToString());
+        // Console.WriteLine(start_j.ToString());
 
 		if(this.dims.Item1 <= start_i  + 1){
 			return this;
@@ -279,7 +280,7 @@ public class Matrix
 
 				if (i == this.dims.Item2 - 1)
 				{
-                    Console.WriteLine(this);
+                    // Console.WriteLine(this);
 					return this.to_row_echelon_form(start_i, start_j + 1);
 				}
 			}
@@ -287,16 +288,52 @@ public class Matrix
 
 		for (int i = start_i + 1; i < this.dims.Item1; i++)
 		{
-            Console.WriteLine($"added {start_i} {i} {-this[i,start_j]/this[start_i,start_j]}");
-			Console.WriteLine(this);
+            // Console.WriteLine($"added {start_i} {i} {-this[i,start_j]/this[start_i,start_j]}");
+			// Console.WriteLine(this);
             this.add_row(start_i, i, -this[i, start_j] / this[start_i, start_j]);
-            Console.WriteLine(this);
+            // Console.WriteLine(this);
         }
 
         Console.WriteLine(this);
 
 		return this.to_row_echelon_form(start_i + 1, start_j + 1);
 	}
+
+    public static Matrix thread_multiply(Matrix A, Matrix B) {
+        Matrix C = new Matrix(A.dims.Item1, B.dims.Item2, false);
+        for(int i = 0; i < C.dims.Item1; i++){
+            for (int j = 0; j < C.dims.Item2; j++){
+                Thread t = new Thread(
+                    (object? x) => {
+                        Console.WriteLine(x);
+                        if (x == null){
+                            Console.WriteLine("No x");
+                            return;
+                        }
+
+                        (Matrix, Matrix, Matrix, int, int) xs = ((Matrix, Matrix, Matrix, int, int))x;
+                        Console.WriteLine(xs);
+                        Matrix A = xs.Item1;
+                        Matrix B = xs.Item2;
+                        Matrix C = xs.Item3;
+                        int i = xs.Item4;
+                        int j = xs.Item5;
+
+                        Console.WriteLine($"");
+
+                        // C[i,j] = 0;
+                        // for (int k =0; k <  A.dims.Item2; k ++) {
+                        //     C[i,j] += A[i,k] * B[k,j];
+                        // }
+
+                        return;
+                    }
+                );
+                t.Start((A,B,C,i,j));
+            }
+        }
+        return C;
+    }
 }
 
 public class SquareMatrix : Matrix
@@ -336,9 +373,10 @@ public class Program
 	public static void Main()
 	{
 		Matrix A = new Matrix(3,3);
-		Matrix B = new SquareMatrix(3);
+		Matrix B = new Matrix(3, 3);
 		Console.WriteLine(A);
-		// Console.WriteLine(B);
+		Console.WriteLine(B);
+        	Console.WriteLine(Matrix.thread_multiply(A,B));
 		// Console.WriteLine(A + B);
 		// Console.WriteLine(A * B);
 		// Console.WriteLine(B * A);
@@ -348,7 +386,7 @@ public class Program
 		// Console.WriteLine(A.create_without());
 		// Console.WriteLine(A.calculate_rank());
 		// Console.WriteLine(B.calculate_rank());
-		Console.WriteLine(A.to_row_echelon_form(0,0));
+		// Console.WriteLine(A.to_row_echelon_form(0,0));
 		// Console.WriteLine(A);
 		// Console.WriteLine(B);
 	}
