@@ -9,11 +9,10 @@ public class App : Application
     public override void Initialize()
     {
         var fluent = new Avalonia.Themes.Fluent.FluentTheme();
-        /*fluent. = 0;*/
 
         Styles styles = new Styles();
         styles.Add(fluent);
-        Application.Current.Styles.Add(styles);
+        Application.Current?.Styles.Add(styles);
     }
 
     public override void OnFrameworkInitializationCompleted()

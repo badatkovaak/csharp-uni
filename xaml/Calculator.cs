@@ -1,125 +1,78 @@
-using System;
-
-interface Expression
-{
-    public double evaluate();
-    public int get_priority();
-}
-
-class Number : Expression
-{
-    public double value;
-
-    public Number() { }
-
-    public Number(double val)
-    {
-        this.value = val;
-    }
-
-    public double evaluate() => this.value;
-
-    public int get_priority() => int.MaxValue;
-
-    public override string ToString()
-    {
-        return this.value.ToString();
-    }
-}
-
-enum Operation
-{
-    Addition,
-    Subtraction,
-    Multiplication,
-    Division,
-}
-
-class OperationUtils
-{
-    public static int get_op_priority(Operation op) =>
-        op switch
-        {
-            Operation.Addition or Operation.Subtraction => 1,
-            Operation.Multiplication or Operation.Division => 2,
-            _ => throw new Exception("Never Happens"),
-        };
-
-    public static string to_string(Operation op) =>
-        op switch
-        {
-            Operation.Addition => "+",
-            Operation.Subtraction => "-",
-            Operation.Multiplication => "*",
-            Operation.Division => "/",
-            _ => throw new Exception("Never Happens"),
-        };
-}
-
-class BinaryExpression : Expression
-{
-    public Operation operation;
-    public Expression left;
-    public Expression right;
-
-    public BinaryExpression(Operation op, Expression left, Expression right)
-    {
-        this.operation = op;
-        this.left = left;
-        this.right = right;
-    }
-
-    public double evaluate() =>
-        this.operation switch
-        {
-            Operation.Addition => left.evaluate() + right.evaluate(),
-            Operation.Subtraction => left.evaluate() - right.evaluate(),
-            Operation.Multiplication => left.evaluate() * right.evaluate(),
-            Operation.Division => left.evaluate() / right.evaluate(),
-            _ => throw new Exception("Never Happens"),
-        };
-
-    public int get_priority() => OperationUtils.get_op_priority(this.operation);
-
-    public override string ToString()
-    {
-        string res = "(";
-        res += this.left.ToString();
-        res += " " + OperationUtils.to_string(this.operation) + " ";
-        res += this.right.ToString();
-        res += ")";
-        return res;
-    }
-}
-
-// 2 + (3 * 4)
-// 2 + ((3 * 4) + 5)
-
-
-// ((2 + 3) + 4) + 5
-// ((2 + 3) + 4) + (5 * 6)
-
-// 2 + (3 * (4 & 5))
-// 2 + (3 * ((4 & 5) * 6)
+using Avalonia.Controls;
 
 class Calculator
 {
-    public double value;
+    double total;
+    double current_input;
+    TextBlock? total_display;
+    TextBlock? current_display;
     public Expression expression;
+    public BinaryOperation? current_op;
 
-    public Calculator()
+    public double Total
     {
-        this.value = 0.0;
+        get => this.total;
+        set
+        {
+            this.total = value;
+            if (this.expression.GetType() == typeof(Number))
+            {
+                Number n = (Number)this.expression;
+                n.value = value;
+            }
+            if (total_display is not null)
+                total_display.Text = this.total.ToString();
+        }
+    }
+
+    public double CurrentInput
+    {
+        get => this.current_input;
+        set
+        {
+            this.current_input = value;
+            if (current_display is not null)
+                current_display.Text = this.current_input.ToString();
+        }
+    }
+
+    public Calculator(TextBlock b1, TextBlock b2)
+    {
+        this.total = 0.0;
         this.expression = new Number();
+        this.total_display = b1;
+        this.current_display = b2;
     }
 
     public Calculator(Expression expr, double value)
     {
-        this.value = value;
+        this.total = value;
         this.expression = expr;
     }
 
-    public void add_operation(Operation op, double value)
+    public void AddDigitToInput(double value)
+    {
+        this.CurrentInput = this.CurrentInput * 10 + value;
+    }
+
+    public void DeleteDigitFromInput()
+    {
+        this.CurrentInput = (this.CurrentInput - this.CurrentInput % 10) / 10;
+    }
+
+    public void ClearAll()
+    {
+        this.Total = 0;
+        this.CurrentInput = 0;
+        this.expression = new Number(0);
+    }
+
+    public void UpdateTotal()
+    {
+        this.Total = this.expression.evaluate();
+    }
+
+    public void AddOperation(BinaryOperation op, double value)
     {
         if (this.expression.GetType() == typeof(Number))
         {
