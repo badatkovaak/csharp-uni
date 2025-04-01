@@ -288,11 +288,41 @@ public class Polynomial
         return res;
     }
 
+    public static Polynomial constructLagrangeBasisPolynomial(List<(double, double)> points, int j)
+    {
+        Polynomial res = new Polynomial(new List<Monom>([new Monom(1)]));
+
+        for (int i = 0; i < points.Count; i++)
+        {
+            if (i != j)
+            {
+                double coef = 1 / (points[j].Item1 - points[i].Item1);
+                res *= new Polynomial(
+                    new List<Monom>([new Monom(coef, [1]), new Monom(-coef * points[i].Item1)])
+                );
+            }
+        }
+
+        return res;
+    }
+
     public static Polynomial constructLagrangePolynomial((double, double)[] points)
     {
         Polynomial res = new Polynomial();
 
         for (int i = 0; i < points.Length; i++)
+        {
+            res += points[i].Item2 * constructLagrangeBasisPolynomial(points, i);
+        }
+
+        return res;
+    }
+
+    public static Polynomial constructLagrangePolynomial(List<(double, double)> points)
+    {
+        Polynomial res = new Polynomial();
+
+        for (int i = 0; i < points.Count; i++)
         {
             res += points[i].Item2 * constructLagrangeBasisPolynomial(points, i);
         }
@@ -312,5 +342,23 @@ public class Polynomial
         }
 
         return result;
+    }
+}
+
+class Utils
+{
+    public static List<T> Concat<T>(params List<T>[] args)
+    {
+        int len = 0;
+        foreach (List<T> l in args)
+            len += l.Count;
+
+        List<T> res = new List<T>(len);
+
+        foreach (List<T> l in args)
+        foreach (T item in l)
+            res.Add(item);
+
+        return res;
     }
 }

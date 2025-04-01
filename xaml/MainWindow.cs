@@ -16,7 +16,6 @@ public class MainWindow : Window
         Grid key_grid = new Grid();
         key_grid.HorizontalAlignment = HorizontalAlignment.Stretch;
         key_grid.VerticalAlignment = VerticalAlignment.Stretch;
-        key_grid.ShowGridLines = true;
 
         for (int i = 0; i < 4; i++)
         {
@@ -84,6 +83,21 @@ public class MainWindow : Window
         Grid.SetColumn(eq, 4);
         key_grid.Children.Add(eq);
 
+        Button sign = create("-", DigitOnClick);
+        Grid.SetRow(sign, 3);
+        Grid.SetColumn(sign, 0);
+        key_grid.Children.Add(sign);
+
+        Button left_paren = create("(", DigitOnClick);
+        Grid.SetRow(left_paren, 3);
+        Grid.SetColumn(left_paren, 2);
+        key_grid.Children.Add(left_paren);
+
+        Button right_paren = create(")", DigitOnClick);
+        Grid.SetRow(right_paren, 3);
+        Grid.SetColumn(right_paren, 3);
+        key_grid.Children.Add(right_paren);
+
         Grid main_grid = new Grid();
         main_grid.VerticalAlignment = VerticalAlignment.Stretch;
         main_grid.HorizontalAlignment = HorizontalAlignment.Stretch;
@@ -94,12 +108,12 @@ public class MainWindow : Window
 
         TextBlock input = new TextBlock();
         input.Text = "";
-        input.FontSize = 40;
+        input.FontSize = 50;
         input.HorizontalAlignment = HorizontalAlignment.Right;
 
         TextBlock total = new TextBlock();
         total.Text = "0";
-        total.FontSize = 40;
+        total.FontSize = 50;
         total.HorizontalAlignment = HorizontalAlignment.Right;
 
         Grid.SetRow(input, 0);
@@ -182,14 +196,14 @@ public class MainWindow : Window
         if (s is null)
             return;
 
-        if (s[-1] == ' ')
+        if (s[s.Length - 1] == ' ')
         {
-            if (s.Length < 3)
+            if (s.Length <= 3)
                 throw new Exception("too low input len");
 
             this.input.Text = s.Remove(s.Length - 3);
         }
-        else
+        else if (s.Length >= 1)
             this.input.Text = s.Remove(s.Length - 1);
     }
 
@@ -200,7 +214,7 @@ public class MainWindow : Window
             VerticalAlignment.Stretch,
             HorizontalAlignment.Center,
             VerticalAlignment.Center,
-            40,
+            50,
             f
         );
 }

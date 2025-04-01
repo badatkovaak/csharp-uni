@@ -203,13 +203,11 @@ class Parser
         /*Console.WriteLine($"Simple -- {this.pos}, {this.Peek()}");*/
 
         SkipWhitespace();
-
         char? c = this.Peek();
 
         if (c == '(')
         {
             this.Next();
-
             Expression? e = ParseBinaryExpression(OperationUtils.MinBinaryPrecedence);
 
             /*Console.WriteLine($"Simple result is {e}");*/
@@ -223,7 +221,6 @@ class Parser
                 return null;
 
             this.Next();
-
             return e;
         }
         else if (c >= '0' && c <= '9')
@@ -237,7 +234,6 @@ class Parser
         /*Console.WriteLine($"Unary -- {this.pos}, {this.Peek()}");*/
 
         SkipWhitespace();
-
         char? c = this.Peek();
 
         if (c is null)
@@ -250,7 +246,6 @@ class Parser
             this.Next();
 
         Expression? e = ParseSimpleExpression();
-
         /*Console.WriteLine($"Unary result is {e}");*/
 
         if (e is null)
@@ -267,7 +262,6 @@ class Parser
         /*Console.WriteLine($"Binary - {this.pos}, {this.Peek()}, {precedence}");*/
 
         SkipWhitespace();
-
         Expression? e1;
 
         if (precedence + 1 <= OperationUtils.MaxBinaryPrecedence)
@@ -286,20 +280,17 @@ class Parser
         }
 
         /*Console.WriteLine($"Binary E1 is {e1}");*/
-
         List<(BinaryOperation, Expression)> l = new List<(BinaryOperation, Expression)>();
 
         while (true)
         {
             SkipWhitespace();
-
             char? c = this.Peek();
 
             if (c is null)
                 break;
 
-            BinaryOperation? op = OperationUtils.from_string(c.ToString());
-
+            BinaryOperation? op = OperationUtils.from_string(((char)c).ToString());
             /*Console.WriteLine($"Binary op is {op}, {precedence}");*/
 
             if (op is null)
@@ -309,9 +300,7 @@ class Parser
                 break;
 
             this.Next();
-
             Expression? e2 = ParseBinaryExpression(precedence + 1);
-
             /*Console.WriteLine($"Binary E2 is {e2}");*/
 
             if (e2 is null)
@@ -340,8 +329,6 @@ class Parser
 
     public Expression? Parse()
     {
-        /*Console.WriteLine(this.input + "\n------\n");*/
-
         return ParseBinaryExpression(OperationUtils.MinBinaryPrecedence);
     }
 }
