@@ -5,7 +5,6 @@ using Avalonia.Layout;
 
 public class MainWindow : Window
 {
-    /*Calculator calc;*/
     TextBlock input;
     TextBlock total;
 
@@ -30,18 +29,6 @@ public class MainWindow : Window
         for (int i = 1; i < 11; i++)
         {
             Button b = create((i % 10).ToString(), DigitOnClick);
-            /*Button b = new Button();*/
-            /*b.FontSize = 40;*/
-            /*b.HorizontalAlignment = HorizontalAlignment.Stretch;*/
-            /*b.VerticalAlignment = VerticalAlignment.Stretch;*/
-            /**/
-            /*Label l = new Label();*/
-            /*l.Content = (i % 10).ToString();*/
-            /*l.HorizontalAlignment = HorizontalAlignment.Center;*/
-            /*l.VerticalAlignment = VerticalAlignment.Center;*/
-            /*b.Content = l;*/
-            /*b.Click += DigitOnClick;*/
-
             Grid.SetRow(b, (i - 1) / 3 + i / 10);
             Grid.SetColumn(b, (i - 1) % 3 + i / 10);
 

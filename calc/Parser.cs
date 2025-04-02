@@ -329,6 +329,16 @@ class Parser
 
     public Expression? Parse()
     {
-        return ParseBinaryExpression(OperationUtils.MinBinaryPrecedence);
+        Expression? res = ParseBinaryExpression(OperationUtils.MinBinaryPrecedence);
+
+        if (res is null)
+            return null;
+
+        SkipWhitespace();
+
+        if (this.pos != this.length)
+            return null;
+
+        return res;
     }
 }

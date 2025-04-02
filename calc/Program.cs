@@ -1,7 +1,7 @@
 ﻿using System;
 using Avalonia;
 
-namespace xaml;
+namespace calc;
 
 class Program
 {

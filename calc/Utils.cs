@@ -3,8 +3,6 @@ using Avalonia.Controls;
 using Avalonia.Interactivity;
 using Avalonia.Layout;
 
-/*using Avalonia. /*/
-
 class Utils
 {
     public static Button create_button(

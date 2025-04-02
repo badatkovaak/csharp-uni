@@ -2,7 +2,7 @@ using Avalonia;
 using Avalonia.Controls.ApplicationLifetimes;
 using Avalonia.Styling;
 
-namespace xaml;
+namespace calc;
 
 public class App : Application
 {
