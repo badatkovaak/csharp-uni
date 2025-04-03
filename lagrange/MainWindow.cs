@@ -1,76 +1,79 @@
 using Avalonia.Controls;
-using Avalonia.Interactivity;
+using Avalonia.Controls.Shapes;
+using Avalonia.Input;
 using Avalonia.Layout;
+using Avalonia.Media;
 
 namespace Lagrange;
 
 class MainWindow : Window
 {
-    TextBlock display;
+    private Canvas canvas;
+    private TextBlock result;
+    private List<(double, double)> points;
 
     public MainWindow()
     {
         this.Title = "Lagrange";
 
-        Grid main_grid = new Grid();
-        main_grid.HorizontalAlignment = HorizontalAlignment.Stretch;
-        main_grid.VerticalAlignment = VerticalAlignment.Stretch;
+        Grid main_grid = new Grid
+        {
+            HorizontalAlignment = HorizontalAlignment.Stretch,
+            VerticalAlignment = VerticalAlignment.Stretch,
+        };
 
-        main_grid.RowDefinitions.Add(new RowDefinition(1, GridUnitType.Auto));
-        /*main_grid.RowDefinitions.Add(new RowDefinition(1, GridUnitType.Auto));*/
         main_grid.RowDefinitions.Add(new RowDefinition(1, GridUnitType.Star));
+        main_grid.RowDefinitions.Add(new RowDefinition(1, GridUnitType.Auto));
+        main_grid.RowDefinitions.Add(new RowDefinition(1, GridUnitType.Auto));
 
-        TextBox input = new TextBox();
-        input.HorizontalAlignment = HorizontalAlignment.Stretch;
-        input.VerticalAlignment = VerticalAlignment.Stretch;
-        input.Watermark =
-            "Write your points below as comma-separated list of comma-separated pairs (something like (1, 0), (2,1), ...)";
-        input.TextWrapping = Avalonia.Media.TextWrapping.Wrap;
-        input.AcceptsReturn = true;
-        input.TextChanged += InputHandler;
-        Grid.SetRow(input, 0);
-        main_grid.Children.Add(input);
+        for (int i = 0; i < 10; i++)
+            main_grid.ColumnDefinitions.Add(new ColumnDefinition(0.1, GridUnitType.Star));
 
-        /*Button enter = new Button();*/
-        /*enter.HorizontalAlignment = HorizontalAlignment.Right;*/
-        /*enter.VerticalAlignment = VerticalAlignment.Top;*/
-        /*enter.Content = "Enter";*/
-        /*Grid.SetRow(enter, 1);*/
-        /*main_grid.Children.Add(enter);*/
+        Canvas canvas = new Canvas
+        {
+            VerticalAlignment = VerticalAlignment.Stretch,
+            HorizontalAlignment = HorizontalAlignment.Stretch,
+            Background = Brushes.White,
+        };
+        canvas.PointerPressed += PointerPressedHandler;
 
-        TextBlock result = new TextBlock();
-        result.HorizontalAlignment = HorizontalAlignment.Stretch;
-        result.VerticalAlignment = VerticalAlignment.Stretch;
-        result.Text = "Lagrange Polynomial of Points - ";
-        Grid.SetRow(result, 1);
-        main_grid.Children.Add(result);
+        Line l1 = new Line();
+
+        Grid.SetRow(canvas, 0);
+        Grid.SetColumn(canvas, 0);
+        Grid.SetColumnSpan(canvas, 10);
+        main_grid.Children.Add(canvas);
+
+        TextBox x_lower_bound = new TextBox();
+        Grid.SetRow(x_lower_bound, 1);
+        Grid.SetColumn(x_lower_bound, 1);
+        main_grid.Children.Add(x_lower_bound);
+        // TextBox x_upper_bound = new TextBox();
+        // Grid.SetRow(x_upper_bound, 1);
+        // TextBox y_lower_bound = new TextBox();
+        // Grid.SetRow(y_lower_bound, 1);
+        // TextBox y_upper_bound = new TextBox();
+        // Grid.SetRow(y_upper_bound, 1);
+
+        TextBlock display = new TextBlock
+        {
+            HorizontalAlignment = HorizontalAlignment.Stretch,
+            VerticalAlignment = VerticalAlignment.Stretch,
+            Text = "Hello There",
+        };
+        Grid.SetRow(display, 2);
+        Grid.SetColumn(display, 0);
+        Grid.SetColumnSpan(display, 10);
+        main_grid.Children.Add(display);
 
         this.Content = main_grid;
-        this.display = result;
+        this.result = display;
+        this.canvas = canvas;
+        this.points = new List<(double, double)>();
     }
 
-    public void InputHandler(object? sender, RoutedEventArgs e)
+    public void PointerPressedHandler(object? sender, PointerPressedEventArgs e)
     {
-        if (e.Source is null)
-            return;
-
-        TextBox t = (TextBox)e.Source;
-
-        if (t.Text is null)
-            return;
-
-        Console.WriteLine($"text changed - {t.Text}");
-        Parser p = new Parser(t.Text);
-        List<(double, double)>? points = p.ParsePoints();
-
-        if (points is null)
-            Console.WriteLine("result is null");
-
-        if (points is null)
-            return;
-
-        Polynomial result = Polynomial.constructLagrangePolynomial(points);
-        Console.WriteLine(result);
-        this.display.Text = result.ToString();
+        Console.WriteLine(e.GetPosition(this.canvas));
     }
 }
