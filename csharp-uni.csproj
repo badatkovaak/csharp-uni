@@ -9,5 +9,9 @@
     <ItemGroup>
         <None Remove="calc/**/*"/>
         <Compile Remove="calc/**/*"/>
+        <None Remove="lagrange/**/*"/>
+        <Compile Remove="lagrange/**/*"/>
+        <None Remove="paint/**/*"/>
+        <Compile Remove="paint/**/*"/>
     </ItemGroup>
 </Project>
