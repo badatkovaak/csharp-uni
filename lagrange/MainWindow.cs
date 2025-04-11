@@ -1,5 +1,4 @@
 using Avalonia.Controls;
-using Avalonia.Controls.Shapes;
 using Avalonia.Input;
 using Avalonia.Layout;
 using Avalonia.Media;
@@ -29,15 +28,11 @@ class MainWindow : Window
         for (int i = 0; i < 10; i++)
             main_grid.ColumnDefinitions.Add(new ColumnDefinition(0.1, GridUnitType.Star));
 
-        Canvas canvas = new Canvas
-        {
-            VerticalAlignment = VerticalAlignment.Stretch,
-            HorizontalAlignment = HorizontalAlignment.Stretch,
-            Background = Brushes.White,
-        };
+        CooridnateGrid canvas = new CooridnateGrid();
+        canvas.VerticalAlignment = VerticalAlignment.Stretch;
+        canvas.HorizontalAlignment = HorizontalAlignment.Stretch;
+        canvas.Background = Brushes.White;
         canvas.PointerPressed += PointerPressedHandler;
-
-        Line l1 = new Line();
 
         Grid.SetRow(canvas, 0);
         Grid.SetColumn(canvas, 0);
@@ -46,7 +41,7 @@ class MainWindow : Window
 
         TextBox x_lower_bound = new TextBox();
         Grid.SetRow(x_lower_bound, 1);
-        Grid.SetColumn(x_lower_bound, 1);
+        Grid.SetColumn(x_lower_bound, 0);
         main_grid.Children.Add(x_lower_bound);
         // TextBox x_upper_bound = new TextBox();
         // Grid.SetRow(x_upper_bound, 1);
