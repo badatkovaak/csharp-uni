@@ -13,5 +13,7 @@
         <Compile Remove="lagrange/**/*"/>
         <None Remove="paint/**/*"/>
         <Compile Remove="paint/**/*"/>
+        <None Remove="lin/**/*"/>
+        <Compile Remove="lin/**/*"/>
     </ItemGroup>
 </Project>
