@@ -48,8 +48,8 @@
         /*c.add_operation(Operation.Addition, 8);*/
         /*Console.WriteLine(c.expression);*/
 
-        Matrix A = new Matrix(2, 2);
-        Matrix B = new SquareMatrix(2);
+        // Matrix A = new Matrix(2, 2);
+        // Matrix B = new SquareMatrix(2);
 
         // double[,,] vals = new double[2, 2, 2]
         // {
@@ -63,8 +63,8 @@
         //     },
         // };
         // Matrix C = new Matrix(vals);
-        Console.WriteLine(A);
-        Console.WriteLine(B);
+        // Console.WriteLine(A);
+        // Console.WriteLine(B);
         // Console.WriteLine(C);
         // Console.WriteLine(A + B);
         // Console.WriteLine(A * B);
@@ -73,8 +73,8 @@
         // Console.WriteLine(A.add_row(0, 1, 2.0));
         // Console.WriteLine(A.multiply_row(0, 2.0));
         // Console.WriteLine(A.create_without());
-        Console.WriteLine(A.calculate_rank());
-        Console.WriteLine(B.calculate_rank());
+        // Console.WriteLine(A.calculate_rank());
+        // Console.WriteLine(B.calculate_rank());
         // Console.WriteLine(C.calculate_rank());
         // Console.WriteLine(A.to_row_echelon_form());
         // Console.WriteLine(A);

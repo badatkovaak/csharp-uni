@@ -42,7 +42,7 @@ public class Vector
 
     public static double DotProduct(Vector A, Vector B)
     {
-        return DotProduct(A, B, SquareMatrix.Convert(Matrix.GetIdMatrix(A.Dimension)));
+        return DotProduct(A, B, SquareMatrix.GetIdMatrix(A.Dimension));
     }
 
     public double GetNorm(SquareMatrix G)
@@ -84,6 +84,19 @@ public class Vector
         return (C1, C2);
     }
 
+    public static Vector Concat(Vector A, Vector B)
+    {
+        Vector C = new Vector(A.Dimension + B.Dimension);
+
+        for (int i = 0; i < A.Dimension; i++)
+            C[i] = A[i];
+
+        for (int i = 0; i < B.Dimension; i++)
+            C[i + A.Dimension] = B[i];
+
+        return C;
+    }
+
     public static Vector operator +(Vector A, Vector B)
     {
         if (A.Dimension != B.Dimension)
@@ -95,6 +108,16 @@ public class Vector
             C[i] = A[i] + B[i];
 
         return C;
+    }
+
+    public static Vector operator -(Vector A)
+    {
+        return -1 * A;
+    }
+
+    public static Vector operator -(Vector A, Vector B)
+    {
+        return A + (-B);
     }
 
     public static Vector operator *(double c, Vector A)
@@ -110,5 +133,20 @@ public class Vector
     public static Vector operator *(Vector A, double c)
     {
         return c * A;
+    }
+
+    public static double operator *(Vector A, Vector B)
+    {
+        return DotProduct(A, B);
+    }
+
+    public override string ToString()
+    {
+        string res = "";
+
+        for (int i = 0; i < this.Dimension; i++)
+            res += this[i].ToString() + " ";
+
+        return res;
     }
 }
