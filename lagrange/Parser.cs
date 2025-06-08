@@ -37,6 +37,12 @@ class Parser
 
         while (this.Peek() is not null)
         {
+            if (this.Peek() == '-')
+            {
+                num += this.Next();
+                continue;
+            }
+
             if (this.Peek() < '0' || this.Peek() > '9' || this.Peek() == '.')
                 break;
 

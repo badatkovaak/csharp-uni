@@ -140,6 +140,16 @@ public class Monom : IComparable<Monom>
         return !(A == B);
     }
 
+    public double Evaluate(double x)
+    {
+        double result = this.coefficient;
+
+        foreach ((char, int) power in this.powers)
+            result *= Math.Pow(x, power.Item2);
+
+        return result;
+    }
+
     public int CompareTo(Monom? other)
     {
         if ((object?)other == null)
@@ -210,6 +220,16 @@ public class Polynomial
     {
         this.monoms = new List<Monom>(args);
         this.cleanup();
+    }
+
+    public double Evaluate(double x)
+    {
+        double result = 0;
+
+        foreach (Monom m in this.monoms)
+            result += m.Evaluate(x);
+
+        return result;
     }
 
     public Polynomial cleanup()
