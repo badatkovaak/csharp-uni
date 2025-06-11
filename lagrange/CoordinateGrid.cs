@@ -11,6 +11,10 @@ class CooridnateGrid : Canvas
     List<Line> x_gridlines;
     List<Line> y_gridlines;
 
+    private int id = 0;
+    List<(int, List<Line>, Func<double, double>, double)> LinePlots;
+
+
     double y_length;
     double x_length;
 
@@ -56,6 +60,8 @@ class CooridnateGrid : Canvas
             y_gridlines.Add(y_gridline);
         }
 
+        this.LinePlots = new List<(int, List<Line>, Func<double, double>, double)>();
+
         this.EffectiveViewportChanged += OnDimensionsChange;
     }
 
@@ -97,7 +103,7 @@ class CooridnateGrid : Canvas
         return dots;
     }
 
-    public List<Line> PlotFunctionLines(Func<double, double> f, double h)
+    private List<Line> PlotFunctionLineInner(Func<double, double> f, double h)
     {
         int total_len = Convert.ToInt32(Math.Floor(2 * this.x_length / h));
 
@@ -121,8 +127,56 @@ class CooridnateGrid : Canvas
             lines.Add(line);
             previous = current;
         }
-
         return lines;
+    }
+
+    public int PlotFunctionLines(Func<double, double> f, double h)
+    {
+        List<Line> lines = this.PlotFunctionLineInner(f, h);
+
+        this.LinePlots.Add((this.id, lines, f, h));
+        this.id++;
+
+        return this.id - 1;
+    }
+
+    public void RemovePlot(int id)
+    {
+        foreach( (int, List<Line>, Func<double, double>, double) plot in this.LinePlots)
+        {
+            if (plot.Item1 != id)
+                continue;
+
+            foreach (Line line in plot.Item2)
+            {
+                this.Children.Remove(line);
+            }
+        }
+
+        this.LinePlots.RemoveAll((x) => x.Item1 == id);
+    }
+
+    public void RedrawPlot(int id)
+    {
+        foreach((int, List<Line>, Func<double, double>, double) plot in this.LinePlots)
+        {
+            if (plot.Item1 != id)
+                continue;
+
+            foreach( Line line in plot.Item2)
+            {
+                this.Children.Remove(line);
+            }
+
+            List<Line> lines = this.PlotFunctionLineInner(plot.Item3, plot.Item4);
+
+            foreach(Line line in lines)
+            {
+                plot.Item2.Add(line);
+            }
+
+            break;
+        }
     }
 
     public void OnDimensionsChange(object? sender, EffectiveViewportChangedEventArgs e)
@@ -172,13 +226,9 @@ class CooridnateGrid : Canvas
             i++;
         }
 
-        // Avalonia.Point coords = this.ConvertCoordinates(-1, 2);
-        // Ellipse p1 = new Ellipse();
-        // p1.Fill = Brushes.Aqua;
-        // p1.Height = 10;
-        // p1.Width = 10;
-        // SetLeft(p1, coords.X - 5);
-        // SetTop(p1, coords.Y - 5);
-        // this.Children.Add(p1);
+        foreach((int, List<Line>, Func<double,double>, double) plot in this.LinePlots)
+        {
+            this.RedrawPlot(plot.Item1);
+        }
     }
 }
