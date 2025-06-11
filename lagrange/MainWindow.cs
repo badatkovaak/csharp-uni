@@ -13,7 +13,7 @@ class MainWindow : Window
     private TextBlock result;
     private TextBox points_input;
     private List<(double, double)> points;
-    private List<Line>? graph;
+    private int? plot_id;
 
     public MainWindow()
     {
@@ -87,13 +87,12 @@ class MainWindow : Window
 
         Polynomial p = Polynomial.constructLagrangePolynomial(points);
 
-        if (this.graph is not null)
+        if (this.plot_id is not null)
         {
-            foreach (Line l in this.graph)
-                this.canvas.Children.Remove(l);
+            this.canvas.RemovePlot((int)plot_id);
         }
 
-        this.graph = this.canvas.PlotFunctionLines((x) => p.Evaluate(x), 0.1);
+        this.plot_id = this.canvas.PlotFunctionLines((x) => p.Evaluate(x), 0.1);
     }
 
     public void PointerPressedHandler(object? sender, PointerPressedEventArgs e)
