@@ -1,5 +1,4 @@
 using Avalonia.Controls;
-using Avalonia.Controls.Shapes;
 using Avalonia.Input;
 using Avalonia.Interactivity;
 using Avalonia.Layout;
@@ -24,8 +23,6 @@ class MainWindow : Window
         main_grid.VerticalAlignment = VerticalAlignment.Stretch;
         main_grid.RowDefinitions.Add(new RowDefinition(1, GridUnitType.Star));
         main_grid.RowDefinitions.Add(new RowDefinition(1, GridUnitType.Auto));
-        main_grid.RowDefinitions.Add(new RowDefinition(1, GridUnitType.Auto));
-        main_grid.RowDefinitions.Add(new RowDefinition(1, GridUnitType.Auto));
 
         for (int i = 0; i < 10; i++)
             main_grid.ColumnDefinitions.Add(new ColumnDefinition(1, GridUnitType.Star));
@@ -48,13 +45,23 @@ class MainWindow : Window
         main_grid.Children.Add(points_input);
         this.points_input = points_input;
 
+        TextBlock tb = new TextBlock();
+        tb.HorizontalAlignment = HorizontalAlignment.Center;
+        tb.VerticalAlignment = VerticalAlignment.Center;
+        tb.Text = "computed polynomial:";
+        tb.FontSize = 16;
+        Grid.SetRow(tb, 1);
+        Grid.SetColumn(tb, 5);
+        main_grid.Children.Add(tb);
+
         TextBlock display = new TextBlock();
-        display.HorizontalAlignment = HorizontalAlignment.Stretch;
-        display.VerticalAlignment = VerticalAlignment.Stretch;
+        display.HorizontalAlignment = HorizontalAlignment.Center;
+        display.VerticalAlignment = VerticalAlignment.Center;
         display.Text = "";
-        Grid.SetRow(display, 2);
-        Grid.SetColumn(display, 0);
-        Grid.SetColumnSpan(display, 10);
+        display.FontSize = 16;
+        Grid.SetRow(display, 1);
+        Grid.SetColumn(display, 6);
+        Grid.SetColumnSpan(display, 4);
         main_grid.Children.Add(display);
 
         Button b = new Button();
@@ -92,7 +99,13 @@ class MainWindow : Window
             this.canvas.RemovePlot((int)plot_id);
         }
 
+        // <<<<<<< HEAD
         this.plot_id = this.canvas.PlotFunctionLines((x) => p.Evaluate(x), 0.1);
+        // =======
+        // this.result.Text = p.ToString();
+
+        // this.graph = this.canvas.PlotFunctionLines((x) => p.Evaluate(x), 0.1);
+        // >>>>>>> 4fd2def (1)
     }
 
     public void PointerPressedHandler(object? sender, PointerPressedEventArgs e)

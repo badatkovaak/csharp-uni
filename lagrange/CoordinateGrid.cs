@@ -1,3 +1,4 @@
+using Avalonia;
 using Avalonia.Controls;
 using Avalonia.Controls.Shapes;
 using Avalonia.Layout;
@@ -13,7 +14,6 @@ class CooridnateGrid : Canvas
 
     private int id = 0;
     List<(int, List<Line>, Func<double, double>, double)> LinePlots;
-
 
     double y_length;
     double x_length;
@@ -65,14 +65,14 @@ class CooridnateGrid : Canvas
         this.EffectiveViewportChanged += OnDimensionsChange;
     }
 
-    public Avalonia.Point ConvertCoordinates(double x, double y)
+    public Point ConvertCoordinates(double x, double y)
     {
         double x_coord = ((x + x_length) / (2 * x_length)) * this.Bounds.Width;
         double y_coord = ((-y + y_length) / (2 * y_length)) * this.Bounds.Height;
-        Console.WriteLine(
-            $"converted to {x_coord}, {y_coord} , {this.Bounds.Height}, {this.Bounds.Width}"
-        );
-        return new Avalonia.Point(x_coord, y_coord);
+        // Console.WriteLine(
+        //     $"converted to {x_coord}, {y_coord} , {this.Bounds.Height}, {this.Bounds.Width}"
+        // );
+        return new Point(x_coord, y_coord);
     }
 
     public List<Ellipse> PlotFunctionDots(Func<double, double> f, double h)
@@ -86,8 +86,8 @@ class CooridnateGrid : Canvas
             double x = -this.x_length + h * i;
             double y = f(x);
 
-            Avalonia.Point point = this.ConvertCoordinates(x, y);
-            Console.WriteLine($"{x}, {y} -> {point}");
+            Point point = this.ConvertCoordinates(x, y);
+            // Console.WriteLine($"{x}, {y} -> {point}");
 
             Ellipse dot = new Ellipse();
             dot.Fill = Brushes.Red;
@@ -103,19 +103,41 @@ class CooridnateGrid : Canvas
         return dots;
     }
 
+    private bool isInsideBounds(Point p)
+    {
+        if (p.X < 0 || p.X > this.Bounds.Width)
+            return false;
+
+        if (p.Y < 0 || p.Y > this.Bounds.Height)
+            return false;
+
+        return true;
+    }
+
+    // <<<<<<< HEAD
     private List<Line> PlotFunctionLineInner(Func<double, double> f, double h)
+    // =======
+    //
+    //     public List<Line> PlotFunctionLines(Func<double, double> f, double h)
+    // // >>>>>>> 4fd2def (1)
     {
         int total_len = Convert.ToInt32(Math.Floor(2 * this.x_length / h));
 
         List<Line> lines = new List<Line>();
         Avalonia.Point previous = this.ConvertCoordinates(-this.x_length, f(-this.x_length));
-        Avalonia.Point current = new Avalonia.Point();
+        Avalonia.Point current = new Point();
 
         for (int i = 0; i < total_len; i++)
         {
             double x = -this.x_length + h * i;
             double y = f(x);
             current = this.ConvertCoordinates(x, y);
+
+            if (!this.isInsideBounds(current) || !this.isInsideBounds(previous))
+            {
+                previous = current;
+                continue;
+            }
 
             Line line = new Line();
             line.Stroke = Brushes.Red;
@@ -142,7 +164,7 @@ class CooridnateGrid : Canvas
 
     public void RemovePlot(int id)
     {
-        foreach( (int, List<Line>, Func<double, double>, double) plot in this.LinePlots)
+        foreach ((int, List<Line>, Func<double, double>, double) plot in this.LinePlots)
         {
             if (plot.Item1 != id)
                 continue;
@@ -158,19 +180,19 @@ class CooridnateGrid : Canvas
 
     public void RedrawPlot(int id)
     {
-        foreach((int, List<Line>, Func<double, double>, double) plot in this.LinePlots)
+        foreach ((int, List<Line>, Func<double, double>, double) plot in this.LinePlots)
         {
             if (plot.Item1 != id)
                 continue;
 
-            foreach( Line line in plot.Item2)
+            foreach (Line line in plot.Item2)
             {
                 this.Children.Remove(line);
             }
 
             List<Line> lines = this.PlotFunctionLineInner(plot.Item3, plot.Item4);
 
-            foreach(Line line in lines)
+            foreach (Line line in lines)
             {
                 plot.Item2.Add(line);
             }
@@ -184,11 +206,11 @@ class CooridnateGrid : Canvas
         double height = this.Bounds.Height;
         double width = this.Bounds.Width;
 
-        this.axes.Item1.StartPoint = new Avalonia.Point(0, height / 2);
-        this.axes.Item1.EndPoint = new Avalonia.Point(width, height / 2);
+        this.axes.Item1.StartPoint = new Point(0, height / 2);
+        this.axes.Item1.EndPoint = new Point(width, height / 2);
 
-        this.axes.Item2.StartPoint = new Avalonia.Point(width / 2, 0);
-        this.axes.Item2.EndPoint = new Avalonia.Point(width / 2, height);
+        this.axes.Item2.StartPoint = new Point(width / 2, 0);
+        this.axes.Item2.EndPoint = new Point(width / 2, height);
 
         double step_x = width / (this.x_gridlines.Count + 2);
         double step_y = height / (this.y_gridlines.Count + 2);
@@ -205,8 +227,8 @@ class CooridnateGrid : Canvas
             if (i == this.x_gridlines.Count / 2 + 1)
                 i++;
 
-            gridline.StartPoint = new Avalonia.Point(0, step_y * i);
-            gridline.EndPoint = new Avalonia.Point(width, step_y * i);
+            gridline.StartPoint = new Point(0, step_y * i);
+            gridline.EndPoint = new Point(width, step_y * i);
             // Console.WriteLine($"{i}th coords are ({gridline.StartPoint}), ({gridline.EndPoint})");
 
             i++;
@@ -219,14 +241,14 @@ class CooridnateGrid : Canvas
             if (i == this.y_gridlines.Count / 2 + 1)
                 i++;
 
-            gridline.StartPoint = new Avalonia.Point(step_x * i, 0);
-            gridline.EndPoint = new Avalonia.Point(step_x * i, height);
+            gridline.StartPoint = new Point(step_x * i, 0);
+            gridline.EndPoint = new Point(step_x * i, height);
             // Console.WriteLine($"{i}th coords are ({gridline.StartPoint}), ({gridline.EndPoint})");
 
             i++;
         }
 
-        foreach((int, List<Line>, Func<double,double>, double) plot in this.LinePlots)
+        foreach ((int, List<Line>, Func<double, double>, double) plot in this.LinePlots)
         {
             this.RedrawPlot(plot.Item1);
         }
