@@ -2,7 +2,7 @@ using Avalonia;
 using Avalonia.Controls.ApplicationLifetimes;
 using Avalonia.Styling;
 
-namespace Lagrange;
+namespace Balls;
 
 public class App : Application
 {

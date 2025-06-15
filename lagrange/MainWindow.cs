@@ -51,7 +51,7 @@ class MainWindow : Window
         tb.Text = "computed polynomial:";
         tb.FontSize = 16;
         Grid.SetRow(tb, 1);
-        Grid.SetColumn(tb, 5);
+        Grid.SetColumn(tb, 4);
         main_grid.Children.Add(tb);
 
         TextBlock display = new TextBlock();
@@ -60,8 +60,8 @@ class MainWindow : Window
         display.Text = "";
         display.FontSize = 16;
         Grid.SetRow(display, 1);
-        Grid.SetColumn(display, 6);
-        Grid.SetColumnSpan(display, 4);
+        Grid.SetColumn(display, 5);
+        Grid.SetColumnSpan(display, 5);
         main_grid.Children.Add(display);
 
         Button b = new Button();
@@ -99,13 +99,8 @@ class MainWindow : Window
             this.canvas.RemovePlot((int)plot_id);
         }
 
-        // <<<<<<< HEAD
-        this.plot_id = this.canvas.PlotFunctionLines((x) => p.Evaluate(x), 0.1);
-        // =======
-        // this.result.Text = p.ToString();
-
-        // this.graph = this.canvas.PlotFunctionLines((x) => p.Evaluate(x), 0.1);
-        // >>>>>>> 4fd2def (1)
+        this.plot_id = this.canvas.PlotFunction((x) => p.Evaluate(x), 0.1);
+        this.result.Text = p.ToString();
     }
 
     public void PointerPressedHandler(object? sender, PointerPressedEventArgs e)
