@@ -4,7 +4,7 @@ namespace Lagrange;
 
 public class Plot
 {
-    public int id;
+    public readonly int id;
     public Func<double, double> function;
     public List<Line> plotLines;
     public double step;

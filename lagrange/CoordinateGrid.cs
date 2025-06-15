@@ -69,39 +69,19 @@ class CooridnateGrid : Canvas
         this.SizeChanged += OnSizeChanged;
     }
 
-    public Point ConvertCoordinates(double x, double y)
+    // public Point ConvertCoordsMathToScreen(double)
+    public Point ConvertCoordsMathToScreen(Vector2 vec)
     {
-        double x_coord = ((x + x_length) / (2 * x_length)) * this.Bounds.Width;
-        double y_coord = ((-y + y_length) / (2 * y_length)) * this.Bounds.Height;
+        double x_coord = ((vec.x + x_length) / (2 * x_length)) * this.Bounds.Width;
+        double y_coord = ((-vec.y + y_length) / (2 * y_length)) * this.Bounds.Height;
         return new Point(x_coord, y_coord);
     }
 
-    // public List<Ellipse> PlotFunctionDots(Func<double, double> f, double h)
-    // {
-    //     int total_len = Convert.ToInt32(Math.Floor(2 * this.x_length / h));
-    //
-    //     List<Ellipse> dots = new List<Ellipse>();
-    //
-    //     for (int i = 0; i < total_len; i++)
-    //     {
-    //         double x = -this.x_length + h * i;
-    //         double y = f(x);
-    //
-    //         Point point = this.ConvertCoordinates(x, y);
-    //
-    //         Ellipse dot = new Ellipse();
-    //         dot.Fill = Brushes.Red;
-    //         dot.Width = 2;
-    //         dot.Height = 2;
-    //         SetLeft(dot, point.X - 1);
-    //         SetTop(dot, point.Y - 1);
-    //
-    //         this.Children.Add(dot);
-    //         dots.Add(dot);
-    //     }
-    //
-    //     return dots;
-    // }
+    public Vector2 ConvertCoordsScreenToMath(Point point){
+        double x = (point.X/this.Bounds.Width - 0.5) *2* x_length;
+        double y = (-point.Y/this.Bounds.Height + 0.5) * 2*y_length;
+        return new Vector2(x, y);
+    }
 
     private bool isInsideBounds(Point p)
     {
@@ -119,14 +99,15 @@ class CooridnateGrid : Canvas
         int total_len = Convert.ToInt32(Math.Floor(2 * this.x_length / h));
 
         List<Line> lines = new List<Line>();
-        Avalonia.Point previous = this.ConvertCoordinates(-this.x_length, f(-this.x_length));
+        Vector2 vec = new Vector2(-this.x_length, f(-this.x_length));
+        Avalonia.Point previous = this.ConvertCoordsMathToScreen(vec);
         Avalonia.Point current = new Point();
 
         for (int i = 0; i < total_len; i++)
         {
             double x = -this.x_length + h * i;
             double y = f(x);
-            current = this.ConvertCoordinates(x, y);
+            current = this.ConvertCoordsMathToScreen(new Vector2(x,y));
 
             if (!this.isInsideBounds(current) || !this.isInsideBounds(previous))
             {
@@ -204,11 +185,17 @@ class CooridnateGrid : Canvas
         return e;
     }
 
-    public void AddSelectedPoint(Point point) {
-        double x = (point.X/this.Bounds.Width - 0.5) *2* x_length;
-        double y = (-point.Y/this.Bounds.Height + 0.5) * 2*y_length;
-        Vector2 v = new Vector2(x, y);
+    public int AddSelectedPoint(Point point) {
+        Vector2 v =  ConvertCoordsScreenToMath(point);
+        Ellipse ellipse = this.DrawSelectedPoint(point);
+
+        this.selectedPoints.Add(new SelectedPoint(this.point_id, v, ellipse));
+        this.point_id++;
+        
+        return point_id;
     }
+
+    public void RedrawSelectedPoint(){}
 
     public void OnSizeChanged(object? sender, SizeChangedEventArgs e)
     {
