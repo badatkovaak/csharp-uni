@@ -170,7 +170,8 @@ public class Monom : IComparable<Monom>
             if (this.coefficient < 0)
                 result += "- ";
 
-            result += System.Math.Abs(this.coefficient).ToString();
+            double coeff = System.Math.Abs(this.coefficient);
+            result += $"{coeff:F6}";
         }
 
         if (this.powers.Count == 1)

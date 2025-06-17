@@ -15,6 +15,8 @@ class CooridnateGrid : Canvas
     List<Plot> plots;
 
     private int point_id = 0;
+
+    // HashSet<SelectedPoint> selectedPoints;
     List<SelectedPoint> selectedPoints;
 
     double y_length;
@@ -64,12 +66,12 @@ class CooridnateGrid : Canvas
         }
 
         this.plots = new List<Plot>();
+        // this.selectedPoints = new HashSet<SelectedPoint>();
         this.selectedPoints = new List<SelectedPoint>();
 
         this.SizeChanged += OnSizeChanged;
     }
 
-    // public Point ConvertCoordsMathToScreen(double)
     public Point ConvertCoordsMathToScreen(Vector2 vec)
     {
         double x_coord = ((vec.x + x_length) / (2 * x_length)) * this.Bounds.Width;
@@ -77,9 +79,10 @@ class CooridnateGrid : Canvas
         return new Point(x_coord, y_coord);
     }
 
-    public Vector2 ConvertCoordsScreenToMath(Point point){
-        double x = (point.X/this.Bounds.Width - 0.5) *2* x_length;
-        double y = (-point.Y/this.Bounds.Height + 0.5) * 2*y_length;
+    public Vector2 ConvertCoordsScreenToMath(Point point)
+    {
+        double x = (point.X / this.Bounds.Width - 0.5) * 2 * x_length;
+        double y = (-point.Y / this.Bounds.Height + 0.5) * 2 * y_length;
         return new Vector2(x, y);
     }
 
@@ -107,7 +110,7 @@ class CooridnateGrid : Canvas
         {
             double x = -this.x_length + h * i;
             double y = f(x);
-            current = this.ConvertCoordsMathToScreen(new Vector2(x,y));
+            current = this.ConvertCoordsMathToScreen(new Vector2(x, y));
 
             if (!this.isInsideBounds(current) || !this.isInsideBounds(previous))
             {
@@ -169,10 +172,9 @@ class CooridnateGrid : Canvas
         }
     }
 
-    public Ellipse DrawSelectedPoint(Point point)
+    public void DrawSelectedPoint(Point point, Ellipse e)
     {
-        double size = 4;
-        Ellipse e = new Ellipse();
+        double size = 10;
         e.Height = size;
         e.Width = size;
         e.Fill = Brushes.Blue;
@@ -181,21 +183,69 @@ class CooridnateGrid : Canvas
         Canvas.SetTop(e, point.Y - size / 2);
 
         this.Children.Add(e);
-
-        return e;
     }
 
-    public int AddSelectedPoint(Point point) {
-        Vector2 v =  ConvertCoordsScreenToMath(point);
-        Ellipse ellipse = this.DrawSelectedPoint(point);
+    public int AddSelectedPoint(Vector2 v)
+    {
+        Point p = ConvertCoordsMathToScreen(v);
+        Ellipse ellipse = new Ellipse();
+        this.DrawSelectedPoint(p, ellipse);
 
         this.selectedPoints.Add(new SelectedPoint(this.point_id, v, ellipse));
         this.point_id++;
-        
+
         return point_id;
     }
 
-    public void RedrawSelectedPoint(){}
+    public int AddSelectedPoint(Point point)
+    {
+        Vector2 v = ConvertCoordsScreenToMath(point);
+        return AddSelectedPoint(v);
+    }
+
+    public void RemoveSelectedPoint(int id)
+    {
+        SelectedPoint? p = null;
+
+        foreach (SelectedPoint point in this.selectedPoints)
+        {
+            if (point.id != id)
+                continue;
+
+            p = point;
+        }
+
+        if (p is null)
+            return;
+
+        this.Children.Remove(p.ellipse);
+        // this.selectedPoints.RemoveWhere((point) => point.id == id);
+        this.selectedPoints.RemoveAll((point) => point.id == id);
+    }
+
+    public void RedrawSelectedPoint(SelectedPoint point)
+    {
+        Point p = ConvertCoordsMathToScreen(point.point);
+        Canvas.SetLeft(point.ellipse, p.X - point.ellipse.Width / 2);
+        Canvas.SetTop(point.ellipse, p.Y - point.ellipse.Height / 2);
+    }
+
+    public void AdjustPoints(List<Vector2> points)
+    {
+        Console.WriteLine("adjust points is called");
+        List<SelectedPoint> toDelete = new List<SelectedPoint>();
+
+        foreach (SelectedPoint selPoint in this.selectedPoints)
+            if (!points.Contains(selPoint.point))
+                toDelete.Add(selPoint);
+
+        foreach (SelectedPoint p in toDelete)
+            this.RemoveSelectedPoint(p.id);
+
+        foreach (Vector2 vec in points)
+            if (!this.selectedPoints.Exists((p) => p.point == vec))
+                this.AddSelectedPoint(vec);
+    }
 
     public void OnSizeChanged(object? sender, SizeChangedEventArgs e)
     {
@@ -243,8 +293,9 @@ class CooridnateGrid : Canvas
         }
 
         foreach (Plot plot in this.plots)
-        {
             this.RedrawPlot(plot);
-        }
+
+        foreach (SelectedPoint point in this.selectedPoints)
+            this.RedrawSelectedPoint(point);
     }
 }

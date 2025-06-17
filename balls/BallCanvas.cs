@@ -9,11 +9,12 @@ namespace Balls;
 public class BallCanvas : Canvas
 {
     List<Ball> balls;
-    const double move_speed = 0.1;
-    const int milliseconds_interval = 15;
+
+    // const double move_speed = 0.1;
+    const int milliseconds_interval = 10;
+    const double move_distance = 1;
 
     // const double move_distance = move_speed * milliseconds_interval;
-    const double move_distance = 1;
 
     public BallCanvas()
     {
@@ -29,7 +30,7 @@ public class BallCanvas : Canvas
         };
 
         timer.Tick += (object? sender, EventArgs e) =>
-            Dispatcher.UIThread.Post(() => this.MoveAllBalls());
+            Dispatcher.UIThread.Post(() => this.MoveAllBalls(), DispatcherPriority.Render);
         timer.Start();
     }
 
@@ -101,8 +102,6 @@ public class BallCanvas : Canvas
             if (Ball.Distance(b1, b2) > 2 * Ball.Radius)
                 continue;
 
-            Console.WriteLine($"from - {b1.Direction} {b2.Direction}");
-
             Point c = b1.Position - b2.Position;
             Point v = (Point)b1.Direction - b2.Direction;
             double coeff1 = PointFunctions.DotProduct(v, c);
@@ -111,7 +110,9 @@ public class BallCanvas : Canvas
             b1.Direction = new Direction(b1.Direction - (coeff1 / coeff2) * c);
             b2.Direction = new Direction(b2.Direction + (coeff1 / coeff2) * c);
 
-            Console.WriteLine($"to - {b1.Direction} {b2.Direction}");
+            double d = Ball.Distance(b1, b2);
+            b1.Position += c * (2 * Ball.Radius - d) / coeff2;
+            b2.Position -= c * (2 * Ball.Radius - d) / coeff2;
         }
     }
 

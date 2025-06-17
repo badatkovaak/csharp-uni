@@ -1,3 +1,4 @@
+using Avalonia;
 using Avalonia.Controls;
 using Avalonia.Input;
 using Avalonia.Interactivity;
@@ -11,7 +12,8 @@ class MainWindow : Window
     private CooridnateGrid canvas;
     private TextBlock result;
     private TextBox points_input;
-    private List<(double, double)> points;
+
+    // private List<(double, double)> points;
     private int? plot_id;
 
     public MainWindow()
@@ -38,12 +40,13 @@ class MainWindow : Window
         main_grid.Children.Add(canvas);
 
         TextBox points_input = new TextBox();
-        points_input.Text = "(-2, -2) (-1, 0) (0, -1) (1, 2)";
+        points_input.Text = "";
         Grid.SetRow(points_input, 1);
         Grid.SetColumn(points_input, 0);
         Grid.SetColumnSpan(points_input, 3);
         main_grid.Children.Add(points_input);
         this.points_input = points_input;
+        points_input.TextChanged += OnTextChanged;
 
         TextBlock tb = new TextBlock();
         tb.HorizontalAlignment = HorizontalAlignment.Center;
@@ -66,7 +69,7 @@ class MainWindow : Window
 
         Button b = new Button();
         b.Content = "Plot";
-        b.Click += ButtonOnClick;
+        b.Click += PlotButtonOnClick;
         Grid.SetRow(b, 1);
         Grid.SetColumn(b, 3);
         main_grid.Children.Add(b);
@@ -74,11 +77,44 @@ class MainWindow : Window
         this.Content = main_grid;
         this.result = display;
         this.canvas = canvas;
-        this.points = new List<(double, double)>();
+        // this.points = new List<(double, double)>();
     }
 
-    public void ButtonOnClick(object? sender, RoutedEventArgs e)
+    public void PlotButtonOnClick(object? sender, RoutedEventArgs e)
     {
+        string? s = this.points_input.Text;
+
+        if (s is null)
+            return;
+
+        Console.WriteLine(s);
+
+        List<(double, double)>? points = new Parser(s).ParsePoints();
+
+        if (points is null)
+            return;
+
+        foreach ((double, double) point in points)
+            Console.Write($"{point}, ");
+        Console.WriteLine();
+
+        foreach ((double, double) point in points)
+            this.canvas.AddSelectedPoint(new Vector2(point));
+
+        Polynomial p = Polynomial.constructLagrangePolynomial(points);
+
+        if (this.plot_id is not null)
+        {
+            this.canvas.RemovePlot((int)plot_id);
+        }
+
+        this.plot_id = this.canvas.PlotFunction((x) => p.Evaluate(x), 0.01);
+        this.result.Text = p.ToString();
+    }
+
+    public void OnTextChanged(object? sender, TextChangedEventArgs e)
+    {
+        Console.WriteLine("text has changed");
         string? s = this.points_input.Text;
 
         if (s is null)
@@ -89,22 +125,28 @@ class MainWindow : Window
         if (points is null)
             return;
 
-        foreach ((double, double) point in points)
-            Console.WriteLine($"({point.Item1}, {point.Item2})");
-
-        Polynomial p = Polynomial.constructLagrangePolynomial(points);
-
-        if (this.plot_id is not null)
-        {
-            this.canvas.RemovePlot((int)plot_id);
-        }
-
-        this.plot_id = this.canvas.PlotFunction((x) => p.Evaluate(x), 0.1);
-        this.result.Text = p.ToString();
+        List<Vector2> points2 = Vector2.TransformToVectors(points);
+        this.canvas.AdjustPoints(points2);
     }
 
     public void PointerPressedHandler(object? sender, PointerPressedEventArgs e)
     {
-        Console.WriteLine(e.GetPosition(this.canvas));
+        Point pointer = e.GetPosition(this.canvas);
+
+        if (!this.canvas.Bounds.Contains(pointer))
+            return;
+
+        this.points_input.Text += " " + this.canvas.ConvertCoordsScreenToMath(pointer) + ", ";
+        this.OnTextChanged(
+            null,
+            new TextChangedEventArgs(
+                new RoutedEvent(
+                    "",
+                    RoutingStrategies.Direct,
+                    typeof(TextChangedEventArgs),
+                    typeof(TextBox)
+                )
+            )
+        );
     }
 }

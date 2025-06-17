@@ -43,7 +43,7 @@ class Parser
                 continue;
             }
 
-            if (this.Peek() < '0' || this.Peek() > '9' || this.Peek() == '.')
+            if ((this.Peek() < '0' || this.Peek() > '9') && this.Peek() != '.')
                 break;
 
             num += this.Next();
@@ -108,9 +108,11 @@ class Parser
             (double, double)? point = ParsePoint();
 
             if (point is null)
-                return null;
+                // return null;
+                continue;
 
             result.Add(((double, double))point);
+
             SkipWhitespace();
 
             if (this.Peek() == ',')
